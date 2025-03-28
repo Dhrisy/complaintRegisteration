@@ -316,6 +316,12 @@ class _OfficerDetailScreenState extends State<OfficerDetailScreen> {
                                   child: Text("Error loading user role."));
                             }
 
+                            if (snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                child: Text("No complaints found."),
+                              );
+                            }
+
                             return Expanded(
                               child: ListView.builder(
                                 padding: EdgeInsets.all(20),

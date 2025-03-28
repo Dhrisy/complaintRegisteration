@@ -335,40 +335,90 @@ class _RegisterComplaintScreenState extends State<RegisterComplaintScreen>
   //   }
   // }
 
-  void _submitComplaint() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+ void _submitComplaint() async {
+  if (!_formKey.currentState!.validate()) {
+    return;
+  }
 
+  setState(() {
+    _isSubmitting = true;
+  });
+
+  User? user = _auth.currentUser;
+  if (user == null) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("User not logged in")));
     setState(() {
-      _isSubmitting = true;
+      _isSubmitting = false;
+    });
+    return;
+  }
+
+  // Validate complaintForm
+  if (complaintForm == null || complaintForm!.fields.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Complaint form is empty")),
+    );
+    setState(() {
+      _isSubmitting = false;
+    });
+    return;
+  }
+
+  // Collect form data safely
+  List<Map<String, String>> formData = complaintForm!.fields.map((field) {
+    return {
+      "label": field.label,
+      "value": controllers[field.label]?.text.trim() ?? "",
+    };
+  }).toList();
+
+  
+
+  try {
+    DocumentReference complaintRef = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection("complaints")
+        .add({
+      'userId': user.uid,
+      'name': _nameController.text,
+      'location': _locationController.text,
+      'department': selectedDepartment,
+      'complaint': complaintText.isNotEmpty
+          ? complaintText
+          : _customComplaintController.text,
+      'status': 'Pending',
+      'priority': 'Medium',
+      'timestamp': Timestamp.now(),
+      'fields': formData,
     });
 
-    User? user = _auth.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("User not logged in")));
+    String complaintId = complaintRef.id;
+
+    // Fetch officers
+    QuerySnapshot officerDocs = await _firestore
+        .collection('officers')
+        .where('department', isEqualTo: selectedDepartment)
+        .get();
+
+    if (officerDocs.docs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No officers found for this department")),
+      );
       setState(() {
         _isSubmitting = false;
       });
       return;
     }
 
-    // Collecting dynamic form data with "label" as the key
-    List<Map<String, String>> formData = complaintForm!.fields.map((field) {
-      return {
-        "label": field.label,
-        "value": controllers[field.label]!.text.trim(),
-      };
-    }).toList();
-
-    try {
-      // Add complaint to user's subcollection
-      DocumentReference complaintRef = await _firestore
-          .collection('users')
-          .doc(user.uid)
+    for (var officerDoc in officerDocs.docs) {
+      await _firestore
+          .collection('officers')
+          .doc(officerDoc.id)
           .collection("complaints")
-          .add({
+          .doc(complaintId)
+          .set({
         'userId': user.uid,
         'name': _nameController.text,
         'location': _locationController.text,
@@ -379,77 +429,55 @@ class _RegisterComplaintScreenState extends State<RegisterComplaintScreen>
         'status': 'Pending',
         'priority': 'Medium',
         'timestamp': Timestamp.now(),
-        // "complaint_type"
-        'fields': formData, // Storing fields as a list with "label"
-      });
-
-      String complaintId = complaintRef.id; // Get the generated complaint ID
-
-      // Find officers in the selected department
-      QuerySnapshot officerDocs = await _firestore
-          .collection('officers')
-          .where('department', isEqualTo: selectedDepartment)
-          .get();
-
-      // Store complaint ID in each officer's subcollection
-      for (var officerDoc in officerDocs.docs) {
+        'fields': formData,
+        'complaintId': complaintId,
+      }).then((_) async {
         await _firestore
-            .collection('officers')
-            .doc(officerDoc.id)
+            .collection("users") // Make sure this is correct
+            .doc(user.uid)
             .collection("complaints")
             .doc(complaintId)
-            .set({
-          'userId': user.uid,
-          'name': _nameController.text,
-          'location': _locationController.text,
-          'department': selectedDepartment,
-          'complaint': complaintText.isNotEmpty
-              ? complaintText
-              : _customComplaintController.text,
-          'status': 'Pending',
-          'priority': 'Medium',
-          'timestamp': Timestamp.now(),
-          // "complaint_type"
-          'fields': formData,
+            .update({
+          "officerId": officerDoc.id,
           'complaintId': complaintId,
-          // 'userId': user.uid,
-          // 'status': 'Pending',
-          // 'timestamp': Timestamp.now(),
         });
-      }
+      });
+    }
 
-      HapticFeedback.mediumImpact();
+    HapticFeedback.mediumImpact();
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text("Complaint Registered Successfully"),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("Complaint Registered Successfully"),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ));
 
-        // Delay before popping to show the success message
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            Navigator.pop(context);
-          }
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Error: ${_getFirebaseErrorMessage(e.toString())}"),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ));
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      });
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Error: ${_getFirebaseErrorMessage(e.toString())}"),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ));
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
+}
+
+
+
 
 // Function to map Firebase errors to user-friendly messages
   String _getFirebaseErrorMessage(String error) {
@@ -756,10 +784,7 @@ class _RegisterComplaintScreenState extends State<RegisterComplaintScreen>
           ),
 
           const SizedBox(height: 16),
-
-          _buildPredefinedForm(),
-          if (selectedDepartment != null) ...[
-            _buildDropdown(
+           _buildDropdown(
               value: selectedTemplate,
               hint: "Select Complaint Type",
               icon: Icons.description_outlined,
@@ -779,6 +804,11 @@ class _RegisterComplaintScreenState extends State<RegisterComplaintScreen>
                 });
               },
             ),
+            const SizedBox(height: 16),
+
+          _buildPredefinedForm(),
+          if (selectedDepartment != null) ...[
+           
             const SizedBox(height: 16),
           ],
           // Custom Complaint TextField

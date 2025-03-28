@@ -767,7 +767,8 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                         final complaintType =
                                             complaintTypes[index % 3];
                                         return Padding(
-                                          padding: const EdgeInsets.only(bottom: 10),
+                                          padding:
+                                              const EdgeInsets.only(bottom: 10),
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
@@ -784,7 +785,8 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                             ),
                                             child: Theme(
                                               data: ThemeData(
-                                                dividerColor: Colors.transparent,
+                                                dividerColor:
+                                                    Colors.transparent,
                                               ),
                                               child: ExpansionTile(
                                                 backgroundColor: Colors.white,
@@ -797,10 +799,11 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                   child: Column(
                                                     children: [
                                                       Container(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 20,
-                                                            vertical: 16),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 20,
+                                                                vertical: 16),
                                                         child: Row(
                                                           children: [
                                                             Container(
@@ -839,14 +842,12 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                                             .spaceBetween,
                                                                     children: [
                                                                       Text(
-                                                                        complaint[
-                                                                                'department']
+                                                                        complaint['department']
                                                                             .toString(),
                                                                         style: const TextStyle(
-                                                                            fontWeight: FontWeight
-                                                                                .bold,
-                                                                            fontSize:
-                                                                                18),
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 18),
                                                                       ),
                                                                       Container(
                                                                         padding: const EdgeInsets
@@ -857,9 +858,8 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                                                 6),
                                                                         decoration:
                                                                             BoxDecoration(
-                                                                          border: Border.all(
-                                                                              color:
-                                                                                  Colors.grey),
+                                                                          border:
+                                                                              Border.all(color: Colors.grey),
                                                                           borderRadius:
                                                                               BorderRadius.circular(20),
                                                                         ),
@@ -868,8 +868,7 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                                           complaint[
                                                                               'status'],
                                                                           style: const TextStyle(
-                                                                              color:
-                                                                                  Colors.grey,
+                                                                              color: Colors.grey,
                                                                               fontWeight: FontWeight.bold,
                                                                               fontSize: 12),
                                                                         ),
@@ -877,11 +876,10 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                                     ],
                                                                   ),
                                                                   const SizedBox(
-                                                                      height: 6),
+                                                                      height:
+                                                                          6),
                                                                   Text(
-                                                                    complaint['fields']
-                                                                                [
-                                                                                0]
+                                                                    complaint['fields'][0]
                                                                             [
                                                                             'value']
                                                                         .toString(),
@@ -893,12 +891,12 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                                             16),
                                                                   ),
                                                                   const SizedBox(
-                                                                      height: 4),
+                                                                      height:
+                                                                          4),
                                                                   Text(
                                                                     "Submitted on ${DateFormat.yMMMd().format(complaint['timestamp'].toDate())}",
                                                                     style: TextStyle(
-                                                                        color: Colors
-                                                                                .grey[
+                                                                        color: Colors.grey[
                                                                             600],
                                                                         fontSize:
                                                                             14),
@@ -910,12 +908,15 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                         ),
                                                       ),
                                                       Container(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 20,
-                                                            vertical: 12),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.grey[50],
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 20,
+                                                                vertical: 12),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Colors.grey[50],
                                                           borderRadius:
                                                               const BorderRadius
                                                                   .only(
@@ -981,9 +982,12 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                                   Column(
                                                     // mainAxisAlignment: ai,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: (complaint['fields']
-                                                                as List<dynamic>?)
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: (complaint[
+                                                                    'fields']
+                                                                as List<
+                                                                    dynamic>?)
                                                             ?.map((field) {
                                                           return Padding(
                                                             padding:
@@ -1323,11 +1327,14 @@ class _UserHomeScreenState extends State<UserHomeScreen>
                                   color: Colors.red,
                                 ),
                               ),
-                              onTap: () async{
-                                final prefs = await SharedPreferences.getInstance();
+                              onTap: () async {
+                                final prefs =
+                                    await SharedPreferences.getInstance();
                                 prefs.clear();
-                                Provider.of<HomeProvider>(context, listen: false).closeSideBar();
-                                
+                                Provider.of<HomeProvider>(context,
+                                        listen: false)
+                                    .closeSideBar();
+
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(

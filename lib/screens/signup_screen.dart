@@ -411,7 +411,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                           SizedBox(height: 20),
                           _buildRoleSelector(),
                           SizedBox(height: 20),
-                          _buildDepartmentSelector(),
+                          _selectedRole == "officer"
+                              ? _buildDepartmentSelector()
+                              : SizedBox.shrink(),
                           SizedBox(height: 30),
                           SizedBox(
                             width: double.infinity,

@@ -84,12 +84,9 @@
 //   }
 // }
 
-
-
-
-
 import 'package:complaint_app/screens/officer_detail_screen.dart';
 import 'package:complaint_app/screens/splash_screen.dart';
+import 'package:complaint_app/screens/user_details_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -100,7 +97,8 @@ class AdminHomeScreen extends StatefulWidget {
   _AdminHomeScreenState createState() => _AdminHomeScreenState();
 }
 
-class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProviderStateMixin {
+class _AdminHomeScreenState extends State<AdminHomeScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -156,7 +154,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                             
                               Text(
                                 'Manage Complaints & Users',
                                 style: TextStyle(
@@ -167,45 +164,45 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
                             ],
                           ),
                         ),
-                    
-                             Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.pink.shade300,
-                                                Colors.blue.shade300
-                                              ],
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(30),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black26,
-                                                blurRadius: 10,
-                                                offset: Offset(0, 4),
-                                              ),
-                                            ],
-                                          ),
-                                          child: IconButton(
-                                            icon: Icon(Icons.logout,
-                                                color: Colors.white),
-                                            onPressed: () async {
-                                              await FirebaseAuth.instance.signOut();
-                                              final prefs =
-                                                  await SharedPreferences
-                                                      .getInstance();
-                                              prefs.clear();
-                    
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          SplashScreen()),
-                                                  (route) => false);
-                                            },
-                                          ),
-                                        ),
-                                      
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.pink.shade300,
+                                    Colors.blue.shade300
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.logout, color: Colors.white),
+                                onPressed: () async {
+                                  await FirebaseAuth.instance.signOut();
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.clear();
+                            
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SplashScreen()),
+                                      (route) => false);
+                                },
+                              ),
+                            ),
+                             Text("Logout")
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -247,7 +244,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
                   ),
                 ),
               ),
-            
             ),
           ];
         },
@@ -259,7 +255,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
                 children: [
                   // Users Tab
                   _buildUsersList(),
-                  
+
                   // Officers Tab
                   _buildOfficersList(),
                 ],
@@ -302,7 +298,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
             padding: EdgeInsets.all(10),
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              var userData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+              var userData =
+                  snapshot.data!.docs[index].data() as Map<String, dynamic>;
               return _buildUserCard(userData);
             },
           );
@@ -342,7 +339,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
             padding: EdgeInsets.all(10),
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              var officerData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+              var officerData =
+                  snapshot.data!.docs[index].data() as Map<String, dynamic>;
               return _buildOfficerCard(officerData);
             },
           );
@@ -391,7 +389,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
         ),
         trailing: ElevatedButton(
           onPressed: () {
-            // Add user management action
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        UserDetailsScreen(id: userData["user_id"])));
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.purple.shade600,
@@ -448,10 +450,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
         ),
         trailing: ElevatedButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => 
-            OfficerDetailScreen(
-              id: officerData["officer_id"],
-            )));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => OfficerDetailScreen(
+                          id: officerData["officer_id"],
+                        )));
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue.shade600,
