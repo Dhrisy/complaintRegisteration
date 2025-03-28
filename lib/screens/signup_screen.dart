@@ -193,7 +193,8 @@ class _SignUpScreenState extends State<SignUpScreen>
             'email': _emailController.text.trim(),
             'role': _selectedRole,
             'createdAt': FieldValue.serverTimestamp(),
-            "department": selectedDepartment
+            "department": selectedDepartment,
+            "officer_id": userCredential.user!.uid
           });
           prefs.setString("role", _selectedRole);
 
@@ -210,7 +211,8 @@ class _SignUpScreenState extends State<SignUpScreen>
             'email': _emailController.text.trim(),
             'role': _selectedRole,
             'createdAt': FieldValue.serverTimestamp(),
-            "department": selectedDepartment
+            "department": selectedDepartment,
+            "user_id": userCredential.user!.uid
           });
           prefs.setString("role", _selectedRole);
 

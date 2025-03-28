@@ -88,8 +88,12 @@
 
 
 
+import 'package:complaint_app/screens/officer_detail_screen.dart';
+import 'package:complaint_app/screens/splash_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   @override
@@ -143,23 +147,65 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
                       end: Alignment.bottomRight,
                     ),
                   ),
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Icon(
-                        //   Icons.admin_panel_settings,
-                        //   color: Colors.white,
-                        //   size: 70,
-                        // ),
-                        // SizedBox(height: 10),
-                        Text(
-                          'Manage Complaints & Users',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
+                        const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                             
+                              Text(
+                                'Manage Complaints & Users',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                    
+                             Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.pink.shade300,
+                                                Colors.blue.shade300
+                                              ],
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                blurRadius: 10,
+                                                offset: Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(Icons.logout,
+                                                color: Colors.white),
+                                            onPressed: () async {
+                                              await FirebaseAuth.instance.signOut();
+                                              final prefs =
+                                                  await SharedPreferences
+                                                      .getInstance();
+                                              prefs.clear();
+                    
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          SplashScreen()),
+                                                  (route) => false);
+                                            },
+                                          ),
+                                        ),
+                                      
                       ],
                     ),
                   ),
@@ -402,7 +448,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProv
         ),
         trailing: ElevatedButton(
           onPressed: () {
-            // Add officer management action
+            Navigator.push(context, MaterialPageRoute(builder: (context) => 
+            OfficerDetailScreen(
+              id: officerData["officer_id"],
+            )));
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue.shade600,

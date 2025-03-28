@@ -111,6 +111,7 @@
 // }
 
 import 'package:complaint_app/controller/home_provider.dart';
+import 'package:complaint_app/screens/email_sender_screen.dart';
 import 'package:complaint_app/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -139,7 +140,12 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
   late Animation<double> _animation;
 
   String statusFilter = "Pending"; // Default filter option
-  List<String> statusFilterOptions = ["All","Pending", "In Progress", "Resolved"];
+  List<String> statusFilterOptions = [
+    "All",
+    "Pending",
+    "In Progress",
+    "Resolved"
+  ];
 
   String priorityFilter = "Pending"; // Default filter option
   List<String> priorityFilterOptions = ["Low", "Medium", "High"];
@@ -166,9 +172,9 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
 
     Query query = complaints;
 
-   if (status.isNotEmpty && status != "All") {
-    query = query.where('status', isEqualTo: status);
-  }
+    if (status.isNotEmpty && status != "All") {
+      query = query.where('status', isEqualTo: status);
+    }
 
     // if (priority.isNotEmpty) {
     //   query = query.where('priority', isEqualTo: priority);
@@ -378,7 +384,6 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
                                       DropdownButton<String>(
                                         value: provider.filter,
                                         borderRadius: BorderRadius.circular(15),
-
                                         icon: Icon(Icons.arrow_drop_down),
                                         style: TextStyle(
                                             color: Colors.black, fontSize: 16),
@@ -388,12 +393,11 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
                                               .blue, // Customize the underline color
                                         ),
                                         onChanged: (String? newValue) {
-                                        
-
-                                          Provider.of<HomeProvider>(context, listen: false).setFilter(newValue!);
-                                          getFilteredComplaints(provider.filter);
-
-                                      
+                                          Provider.of<HomeProvider>(context,
+                                                  listen: false)
+                                              .setFilter(newValue!);
+                                          getFilteredComplaints(
+                                              provider.filter);
                                         },
                                         items: statusFilterOptions
                                             .map<DropdownMenuItem<String>>(
@@ -413,8 +417,7 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
                             // Complaints List
                             Expanded(
                               child: StreamBuilder(
-                                stream:
-                                    getFilteredComplaints(provider.filter),
+                                stream: getFilteredComplaints(provider.filter),
                                 builder: (context,
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
@@ -562,13 +565,69 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
                                                     ),
                                                   ),
 
-                                                  // Update Status Button
+                                                 
                                                   Row(
                                                     children: [
                                                       ElevatedButton(
                                                         onPressed: () {
-                                                          // Add your status update logic here
-                                                          // _updateComplaintStatus(complaint);
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          EmailSenderScreen()));
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          backgroundColor:
+                                                              Colors.purple,
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                          ),
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      20,
+                                                                  vertical: 10),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons.visibility,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Text(
+                                                              "Send Email",
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 15,
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                           updateStatusDialogue(complaintId: complaint['complaintId'],
+                                                                              userId: complaint['userId']);
                                                         },
                                                         style: ElevatedButton
                                                             .styleFrom(
@@ -807,7 +866,10 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
             elevation: 5,
             shadowColor: Colors.blue.shade100,
           ),
-          onPressed: () {},
+          onPressed: () {
+            updateStatusDialogue(complaintId: docId,
+            userId: data['userId']);
+          },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
@@ -1246,6 +1308,32 @@ class _OfficerHomeScreenState extends State<OfficerHomeScreen>
                             ),
                             child: Text(
                               'Update Status',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          EmailSenderScreen()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purple.shade400,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            child: Text(
+                              'Send Email',
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                               ),
